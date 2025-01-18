@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog"
@@ -16,8 +17,6 @@ interface UserListProps {
   title: string
   description: string
   users: User[]
-  onAddNew: (newUser: { name: string; email: string }) => void
-  onUserClick: (userId: string) => void
 }
 
 const userSchema = z.object({
@@ -27,8 +26,16 @@ const userSchema = z.object({
 
 type UserFormValues = z.infer<typeof userSchema>
 
-export default function UserList({ title, description, users, onAddNew, onUserClick }: UserListProps) {
-  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
+export default function UserList({ title, description, users}: UserListProps) {
+
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+
+  const handleAddNew = (newUser: { name: string; email: string }) => {
+
+  }
+  const handleUserClick = (userId: string) => {
+
+  }
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -39,7 +46,7 @@ export default function UserList({ title, description, users, onAddNew, onUserCl
   })
 
   const handleAddNewUser = (values: UserFormValues) => {
-    onAddNew(values)
+    handleAddNew(values)
     setIsAddUserDialogOpen(false)
     form.reset()
   }
@@ -59,7 +66,6 @@ export default function UserList({ title, description, users, onAddNew, onUserCl
             key={user.id}
             variant="outline"
             className="h-auto py-2 px-4 justify-start"
-            onClick={() => onUserClick(user.id)}
           >
             {user.name}
           </Button>

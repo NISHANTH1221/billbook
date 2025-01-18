@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -15,7 +16,6 @@ import { Card, CardContent } from "@/components/ui/card"
 interface User {
   id: string
   name: string
-  amount: number
 }
 
 interface Bill{
@@ -29,7 +29,7 @@ interface Bill{
 
 interface BillTableProps {
   bills: Bill[],
-  onCreateNewBill: (newBill: Omit<Bill, 'id' | 'createdAt' | 'updatedAt'>) => void
+  users: User[]
 }
 
 const createBillSchema = z.object({
@@ -44,7 +44,7 @@ const createBillSchema = z.object({
 
 type CreateBillFormValues = z.infer<typeof createBillSchema>
 
-export default function BillTable({ bills, onCreateNewBill }: BillTableProps) {
+export default function BillTable({ bills , users  }: BillTableProps) {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
@@ -67,13 +67,11 @@ export default function BillTable({ bills, onCreateNewBill }: BillTableProps) {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
-    // Handle form submission here
     console.log("Form submitted", selectedBill)
     handleCloseDialog()
   }
 
   const handleCreateNewBill = (values: CreateBillFormValues) => {
-    onCreateNewBill(values)
     setIsCreateDialogOpen(false)
     form.reset()
   }
@@ -95,11 +93,11 @@ export default function BillTable({ bills, onCreateNewBill }: BillTableProps) {
         </TableHeader>
         <TableBody>
           {bills.map((bill) => (
-            <TableRow key={bill.id} className="border-b transition-colors hover:bg-muted/50">
+            <TableRow key={bill.billId} className="border-b transition-colors hover:bg-muted/50">
               <TableCell className="font-medium">{bill.description}</TableCell>
               <TableCell>${bill.amount.toFixed(2)}</TableCell>
               <TableCell suppressHydrationWarning={true}>{new Date(bill.createdAt).toLocaleDateString()}</TableCell>
-              <TableCell suppressHydrationWarning={true}>{new Date(bill.updatedAt).toLocaleDateString()}</TableCell>
+              <TableCell suppressHydrationWarning={true}>{new Date(bill.lastUpdated).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(bill)} className="float-right">
                   <ChevronRight className="h-4 w-4" />
@@ -121,7 +119,7 @@ export default function BillTable({ bills, onCreateNewBill }: BillTableProps) {
           <form onSubmit={handleSubmit}>
             {selectedBill && (
               <div className="grid gap-4 py-4">
-                {selectedBill.users.map((user) => (
+                {users.map((user) => (
                   <div key={user.id} className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor={`amount-${user.id}`} className="text-right">
                       {user.name}
@@ -129,7 +127,7 @@ export default function BillTable({ bills, onCreateNewBill }: BillTableProps) {
                     <Input
                       id={`amount-${user.id}`}
                       type="number"
-                      defaultValue={user.amount}
+                      defaultValue={0}
                       className="col-span-3"
                     />
                   </div>
