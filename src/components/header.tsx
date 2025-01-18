@@ -1,49 +1,28 @@
-"use client"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { signOut } from "next-auth/react"
-export default function Header(){
-  const [isOpen, setIsOpen] = useState(false);
-  const handleProfileClick = () => {
-    console.log("Profile clicked")
-  }
+import Link from 'next/link'
+import { DollarSign } from 'lucide-react'
 
-  const handleLogout = () => {
-    signOut({callbackUrl:"/"})
-  }
-
-    return(
-        <header className="bg-white shadow-sm sticky z-50 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
-          </div>
-          <div className="flex items-center">
-            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="relative rounded-full border-2 border-gray-200 hover:border-gray-300">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">Open user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={handleProfileClick}>
-                  My Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
-    )
+export function Header() {
+  return (
+    <header className="px-4 lg:px-6 h-14 flex items-center">
+      <Link className="flex items-center justify-center" href="#">
+        <DollarSign className="h-6 w-6" />
+        <span className="ml-2 text-lg font-bold">BillBook</span>
+      </Link>
+      <nav className="ml-auto flex gap-4 sm:gap-6">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          Features
+        </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          Pricing
+        </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          About
+        </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+          Contact
+        </Link>
+      </nav>
+    </header>
+  )
 }
+

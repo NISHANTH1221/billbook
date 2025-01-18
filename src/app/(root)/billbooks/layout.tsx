@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import Header from "@/components/dashboardheader";
 
 export default function AppLayout ({children} : {children : React.ReactNode}){
     return(
