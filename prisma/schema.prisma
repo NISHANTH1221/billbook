@@ -36,6 +36,7 @@ model BillBook{
 model BillBookUser{
   billbookUserId String @id @default(auto()) @map("_id") @db.ObjectId
   name String
+  email String
   billbookId String @db.ObjectId
   billbook BillBook @relation(fields: [billbookId],references: [billbookId])
   billUnits BillUnits[]

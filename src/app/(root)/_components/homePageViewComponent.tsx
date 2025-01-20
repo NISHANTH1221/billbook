@@ -1,4 +1,4 @@
-import AlertDialogHome from "./alertdialog";
+import AlertDialogHome from "./alertdialoghome";
 import BillBookCard from "./billbookcard";
 import { BillBookPreview } from "./models";
 

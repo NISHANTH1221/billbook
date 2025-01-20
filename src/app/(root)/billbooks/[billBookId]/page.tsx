@@ -1,5 +1,5 @@
 import BillTable from '../../_components/bill-table'
-import UserList from '@/components/user-list'
+import UserList from '@/app/(root)/_components/user-list'
 import { getServerSession } from 'next-auth'
 import nextOptions from '@/app/api/auth/[...nextauth]/options'
 import { redirect } from 'next/navigation'
@@ -34,6 +34,7 @@ export default async function BillBookDetailViewPage({ params }:{params : { bill
           title={billBook.title}
           description={billBook.description}
           users={users}
+          billbookId={billBookId}
         />
         <BillTable 
           bills={bills}
