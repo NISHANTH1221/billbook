@@ -20,5 +20,6 @@ export interface Bill{
 
 export interface BillTableProps {
   bills: Bill[],
-  users: User[]
+  users: User[],
+  billbookId : string
 }

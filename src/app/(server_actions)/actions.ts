@@ -7,6 +7,26 @@ interface UserDetails {
     billbookId : string
 }
 
+export async function createNewBill(description:string,amount : number,billbookId:string){
+    try{
+        const bill = await prisma.bill.create({
+            data:{
+                description:description,
+                amount:amount,
+                billbookId:billbookId
+            }
+        });
+        return {
+            success : true,
+            bill
+        };
+    }catch(err:any){
+        return {
+            success : false,
+        }
+    }
+}
+
 
 export async function createNewUserForBillBook(userDetails : UserDetails){
 
@@ -25,4 +45,51 @@ export async function createNewUserForBillBook(userDetails : UserDetails){
     }
     return true
     
+}
+
+interface BillUnitArray{
+    billbookUserId : string,
+    amount: number,
+    billId: string
+}
+
+export async function createBillUnitsForBill(array : BillUnitArray[]){
+
+    try{
+        await prisma.$transaction(async(tx)=>{
+            tx.billUnits.createMany({
+                data: array
+            })
+        });
+
+        return {
+            success : true
+        }
+    }catch(e){
+        return {
+            success : false
+        }
+    }
+}
+
+
+export async function deleteBill(billId : string){
+    try{
+        await prisma.bill.delete({
+            where : {
+                billId : billId
+            }
+        })
+
+        return {
+            success : true
+        }
+
+
+    }catch(e){
+        return {
+            sucess : false
+        }
+
+    }
 }

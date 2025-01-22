@@ -12,6 +12,8 @@ import * as z from "zod"
 import { useState } from 'react'
 import { User } from "./models"
 import { useToast } from "@/hooks/use-toast"
+import { createBillUnitsForBill, createNewBill, deleteBill } from "@/app/(server_actions)/actions"
+import { useRouter } from "next/navigation"
 
 
 
@@ -29,9 +31,10 @@ const createBillSchema = z.object({
     }))
   })
 
-export default function AlertDialogBillButton({users}:{users : User[]}){
+export default function AlertDialogBillButton({users,billbookId}:{users : User[],billbookId: string}){
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
   
     const form = useForm<CreateBillFormValues>({
       resolver: zodResolver(createBillSchema),
@@ -44,7 +47,7 @@ export default function AlertDialogBillButton({users}:{users : User[]}){
   
     
   
-    const handleCreateNewBill = (values: CreateBillFormValues) => {
+    const handleCreateNewBill = async (values: CreateBillFormValues) => {
       let total_amount: number = values.amount;
 
       const users = values.users;
@@ -63,14 +66,48 @@ export default function AlertDialogBillButton({users}:{users : User[]}){
             variant :"destructive"
         })
       }else{
-        for(let i=0;i<users.length;i++){
-            const user : User = users[i];
+        const response = await createNewBill(values.description,total_amount,billbookId);
 
+        if(response.success){
+            if(response.bill){
+                let modified_user_object = users.map((user)=>{
+                    return {
+                      billbookUserId : user.id,
+                      amount: user.amount,
+                      billId: response.bill.billId
+                    }
+                  });
+                const billUnitsResponse = await createBillUnitsForBill(modified_user_object);   
+
+                if(billUnitsResponse){
+                    toast({
+                        title  : "Bill is created",
+                        description:"Bill is created successfully",
+                    })
+                }
+                else{
+                    const billDeleteResponse = await deleteBill(response.bill.billId);
+                    // should implement it as a transaction bill creation and bill units creation
+                    router.refresh();
+                    toast({
+                        title  : "Bill is not created",
+                        variant: "destructive"
+                    });
+                }
+            }else{
+                toast({
+                    title  : "Bill is not created",
+                    variant: "destructive"
+                })
+            }
+        }else{
+            toast({
+                title  : "Bill is not created",
+                description:"Bill couldnt be created because of internal error",
+                variant :"destructive"
+            })
         }
-
-
       }
-
       setIsCreateDialogOpen(false)
       form.reset()
     }

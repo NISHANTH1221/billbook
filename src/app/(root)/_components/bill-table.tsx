@@ -3,12 +3,11 @@ import { BillTableProps } from "./models"
 import AlertDialogBillButton from "./alertdialogbillbutton"
 import AlertDialogUpdateBillButton from "./alertdialogupdatenillbutton"
 
-export default function BillTable({ bills , users  }: BillTableProps  ) {
- 
+export default function BillTable({ bills , users, billbookId  }: BillTableProps  ) {
   return (
     <div className="w-full max-w-4xl mx-auto mt-8">
       <div className="flex justify-end mb-4">
-        <AlertDialogBillButton users={users}/>
+        <AlertDialogBillButton users={users} billbookId={billbookId}/>
       </div>
       <Table className="w-full border-collapse shadow-sm">
         <TableHeader>
@@ -28,7 +27,7 @@ export default function BillTable({ bills , users  }: BillTableProps  ) {
               <TableCell suppressHydrationWarning={true}>{new Date(bill.createdAt).toLocaleDateString()}</TableCell>
               <TableCell suppressHydrationWarning={true}>{new Date(bill.lastUpdated).toLocaleDateString()}</TableCell>
               <TableCell>
-                <AlertDialogUpdateBillButton bill={bill} users={users}/>
+                <AlertDialogUpdateBillButton bill={bill} users={users} />
               </TableCell>
             </TableRow>
           ))}

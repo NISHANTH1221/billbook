@@ -39,6 +39,7 @@ export default async function BillBookDetailViewPage({ params }:{params : { bill
         <BillTable 
           bills={bills}
           users={users} 
+          billbookId={billBookId}
         />
       </div>
     </div>
