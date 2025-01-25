@@ -59,7 +59,7 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
       }
 
 
-      if(total_amount!=total_users_amount){
+      if(total_amount != total_users_amount){
         toast({
             title  : "Bill is not created",
             description:"Amount and Total Users amount must be equal",
@@ -80,6 +80,7 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
                 const billUnitsResponse = await createBillUnitsForBill(modified_user_object);   
 
                 if(billUnitsResponse){
+                    
                     toast({
                         title  : "Bill is created",
                         description:"Bill is created successfully",
@@ -98,18 +99,18 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
                 toast({
                     title  : "Bill is not created",
                     variant: "destructive"
-                })
+                });
             }
         }else{
             toast({
                 title  : "Bill is not created",
                 description:"Bill couldnt be created because of internal error",
                 variant :"destructive"
-            })
+            });
         }
       }
-      setIsCreateDialogOpen(false)
-      form.reset()
+      setIsCreateDialogOpen(false);
+      form.reset();
     }
   
     return(

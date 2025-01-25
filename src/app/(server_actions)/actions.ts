@@ -57,7 +57,7 @@ export async function createBillUnitsForBill(array : BillUnitArray[]){
 
     try{
         await prisma.$transaction(async(tx)=>{
-            tx.billUnits.createMany({
+           await tx.billUnits.createMany({
                 data: array
             })
         });
@@ -92,4 +92,29 @@ export async function deleteBill(billId : string){
         }
 
     }
+}
+
+export async function fetchBillDetails(billId : string){
+    try{
+        const billUnits = await prisma.billUnits.findMany({
+            where : {
+                billId : billId
+            }
+        });
+
+        return {
+            success : true,
+            billUnits : billUnits.map((bill)=>{
+                return{
+                    amount : bill.amount,
+                    billbookUserId : bill.billbookUserId
+                }
+            })
+        }
+    }catch(e){
+        return{
+            success : false
+        }
+    }
+
 }

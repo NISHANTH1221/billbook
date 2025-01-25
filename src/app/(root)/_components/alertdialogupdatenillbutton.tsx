@@ -9,33 +9,53 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent } from "@/components/ui/card"
 import { Bill, User } from "./models";
 import { useState } from "react"
+import { fetchBillDetails } from "@/app/(server_actions)/actions"
 
+interface BillUnit{
+    amount : number,
+    billbookUserId : string
+}
 
-export default function AlertDialogUpdateBillButton({users,bill}:{users:User[],bill: Bill}){
+export default function AlertDialogUpdateBillButton({users,billId,billbookId}:{users:User[],billId: string,billbookId: string}){
 
-    const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+    // const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [users, setUsers] = useState<User & {amount: number}[] | undefined>([]);
     
-
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
-        console.log("Form submitted", selectedBill)
+        // console.log("Form submitted", selectedBill)
         handleCloseDialog()
-      }
+    }
 
-      const handleOpenDialog = (bill: Bill) => {
-        setSelectedBill(bill)
-      }
-    
-      const handleCloseDialog = () => {
-        setSelectedBill(null)
-      }
+    const handleOpenDialog = async () => {
+    // setSelectedBill(!)
+    setIsCreateDialogOpen(true);
+    const billUnitsResponse = await fetchBillDetails(billId);
+
+    if(billUnitsResponse.success){
+        console.log(billUnitsResponse.billUnits)
+        
+    }
+    users.map((user)=>{
+        return {
+            ...user,
+            amount : billUnitsResponse.billUnits?.find((bill)=>bill.billbookUserId==user.id)?.amount
+        }
+    })
+
+    }
+
+    const handleCloseDialog = () => {
+    setIsCreateDialogOpen(false);
+    }
 
     return(
         <>
-            <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(bill)} className="float-right">
+            <Button variant="ghost" size="sm" onClick={() => handleOpenDialog()} className="float-right">
                   <ChevronRight className="h-4 w-4" />
             </Button>
-            <AlertDialog open={selectedBill !== null} onOpenChange={handleCloseDialog}>
+            <AlertDialog open={isCreateDialogOpen} onOpenChange={handleCloseDialog}>
                 <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Bill Details</AlertDialogTitle>
@@ -44,7 +64,7 @@ export default function AlertDialogUpdateBillButton({users,bill}:{users:User[],b
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <form onSubmit={handleSubmit}>
-                    {selectedBill && (
+                    {selectedBillUnits && (
                     <div className="grid gap-4 py-4">
                         {users.map((user) => (
                         <div key={user.id} className="grid grid-cols-4 items-center gap-4">
@@ -54,8 +74,9 @@ export default function AlertDialogUpdateBillButton({users,bill}:{users:User[],b
                             <Input
                             id={`amount-${user.id}`}
                             type="number"
-                            defaultValue={0}
+                            defaultValue={user.}
                             className="col-span-3"
+                            disabled
                             />
                         </div>
                         ))}
@@ -63,7 +84,7 @@ export default function AlertDialogUpdateBillButton({users,bill}:{users:User[],b
                     )}
                     <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction type="submit">Save changes</AlertDialogAction>
+                    {/* <AlertDialogAction type="submit">Update</AlertDialogAction> */}
                     </AlertDialogFooter>
                 </form>
                 </AlertDialogContent>
