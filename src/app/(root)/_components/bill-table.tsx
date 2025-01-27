@@ -27,7 +27,7 @@ export default function BillTable({ bills , users, billbookId  }: BillTableProps
               <TableCell suppressHydrationWarning={true}>{new Date(bill.createdAt).toLocaleDateString()}</TableCell>
               <TableCell suppressHydrationWarning={true}>{new Date(bill.lastUpdated).toLocaleDateString()}</TableCell>
               <TableCell>
-                <AlertDialogUpdateBillButton billId={bill.billId} users={users} billbookId={billbookId}/>
+                <AlertDialogUpdateBillButton billId={bill.billId} users={users} />
               </TableCell>
             </TableRow>
           ))}

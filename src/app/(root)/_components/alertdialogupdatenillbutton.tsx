@@ -10,17 +10,25 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Bill, User } from "./models";
 import { useState } from "react"
 import { fetchBillDetails } from "@/app/(server_actions)/actions"
+import { useToast } from "@/hooks/use-toast"
 
 interface BillUnit{
     amount : number,
     billbookUserId : string
 }
 
-export default function AlertDialogUpdateBillButton({users,billId,billbookId}:{users:User[],billId: string,billbookId: string}){
+interface ModifiedUser{
+    id : string,
+    name : string,
+    amount : number | undefined
+}
+
+export default function AlertDialogUpdateBillButton({users,billId}:{users:User[],billId: string}){
 
     // const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-    const [users, setUsers] = useState<User & {amount: number}[] | undefined>([]);
+    const [modifiedUsers, setModifiedUsers] = useState<ModifiedUser[] | undefined>();
+    const {toast} = useToast();
     
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
@@ -30,24 +38,31 @@ export default function AlertDialogUpdateBillButton({users,billId,billbookId}:{u
 
     const handleOpenDialog = async () => {
     // setSelectedBill(!)
-    setIsCreateDialogOpen(true);
     const billUnitsResponse = await fetchBillDetails(billId);
 
-    if(billUnitsResponse.success){
-        console.log(billUnitsResponse.billUnits)
-        
+    if(!billUnitsResponse.success){
+        toast({
+            title: "Error",
+            description: "Something went wrong",
+        });
     }
-    users.map((user)=>{
+
+    const modifiedusers = users.map((user)=>{
         return {
             ...user,
             amount : billUnitsResponse.billUnits?.find((bill)=>bill.billbookUserId==user.id)?.amount
         }
     })
 
+    setModifiedUsers(modifiedusers);
+    setIsCreateDialogOpen(true);
+
     }
 
     const handleCloseDialog = () => {
+    
     setIsCreateDialogOpen(false);
+    
     }
 
     return(
@@ -64,9 +79,9 @@ export default function AlertDialogUpdateBillButton({users,billId,billbookId}:{u
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <form onSubmit={handleSubmit}>
-                    {selectedBillUnits && (
+                    {modifiedUsers ? (
                     <div className="grid gap-4 py-4">
-                        {users.map((user) => (
+                        {modifiedUsers.map((user) => (
                         <div key={user.id} className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor={`amount-${user.id}`} className="text-right">
                             {user.name}
@@ -74,14 +89,14 @@ export default function AlertDialogUpdateBillButton({users,billId,billbookId}:{u
                             <Input
                             id={`amount-${user.id}`}
                             type="number"
-                            defaultValue={user.}
+                            defaultValue={user.amount}
                             className="col-span-3"
                             disabled
                             />
                         </div>
                         ))}
                     </div>
-                    )}
+                    ) : "No Users in this bill"}
                     <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     {/* <AlertDialogAction type="submit">Update</AlertDialogAction> */}

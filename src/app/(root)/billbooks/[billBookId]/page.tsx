@@ -4,6 +4,8 @@ import { getServerSession } from 'next-auth'
 import nextOptions from '@/app/api/auth/[...nextauth]/options'
 import { redirect } from 'next/navigation'
 import prisma from '../../../../../db/db'
+import UsersAnalyticsComponent from '../../_components/UsersAnalyticsComponent'
+import { getBillsForBillBook, getUsersInBillBook } from '@/app/(server_actions)/actions'
 
 export default async function BillBookDetailViewPage({ params }:{params : { billBookId : string }}) {
 
@@ -36,6 +38,13 @@ export default async function BillBookDetailViewPage({ params }:{params : { bill
           users={users}
           billbookId={billBookId}
         />
+        <UsersAnalyticsComponent
+        users={[...users,{
+          id : session.user.userId,
+          name : "You"
+        }]}
+        billbookId={billBookId}
+        />
         <BillTable 
           bills={bills}
           users={users} 
@@ -59,27 +68,3 @@ async function checkIsValidBillBookId(id:string,userId : string){
   return billBook
 }
 
-async function getUsersInBillBook(id: string){
-    const users = await prisma.billBookUser.findMany({
-      where : {
-      billbookId : id
-      }
-    });
-
-    return users.map((user)=>{
-      return {
-        id : user.billbookUserId,
-        name : user.name
-      }
-    });
-}
-
-async function getBillsForBillBook(billBookId : string){
-
-  const bills = await prisma.bill.findMany({
-    where : {
-      billbookId : billBookId
-    }
-  })
-  return bills;
-}

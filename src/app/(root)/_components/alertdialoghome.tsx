@@ -27,9 +27,9 @@ export default function AlertDialogHome() {
     const router = useRouter();
 
 
-    const handleAddBillBook = () => {
-        console.log("button clicked")
-    }
+    // const handleAddBillBook = () => {
+    //     console.log("button clicked")
+    // }
 
     const handleCreateBillBook = async () => {
         if (newBillBookTitle.trim() === "" && newBillBookDescription.trim() === "") {

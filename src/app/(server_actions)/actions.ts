@@ -118,3 +118,65 @@ export async function fetchBillDetails(billId : string){
     }
 
 }
+
+export async function getBillsForBillBook(billBookId : string){
+
+    const bills = await prisma.bill.findMany({
+      where : {
+        billbookId : billBookId
+      }
+    })
+    return bills;
+}
+
+export  async function getUsersInBillBook(id: string){
+    const users = await prisma.billBookUser.findMany({
+      where : {
+      billbookId : id
+      }
+    });
+
+    return users.map((user)=>{
+      return {
+        id : user.billbookUserId,
+        name : user.name
+      }
+    });
+}
+
+export async function getUserWiseStats(billbookId: string) {
+    try {
+        const bills = await getBillsForBillBook(billbookId);
+        const users = await getUsersInBillBook(billbookId);
+        let userHashmap: { [key: string]: number } = {};
+        
+        // Initialize hashmap
+        users.forEach((user) => {
+            userHashmap[user.id] = 0;
+        });
+
+        // Use for...of instead of forEach to properly handle async operations
+        for (const bill of bills) {
+            const billUnits = await prisma.billUnits.findMany({
+                where: {
+                    billId: bill.billId
+                }
+            });
+
+            billUnits.forEach((unit) => {
+                userHashmap[unit.billbookUserId] += unit.amount;
+            });
+        }
+
+        console.log(userHashmap);
+
+        return {
+            success: true,
+            data: userHashmap
+        };
+    } catch (e: any) {
+        return {
+            success: false
+        };
+    }
+}
