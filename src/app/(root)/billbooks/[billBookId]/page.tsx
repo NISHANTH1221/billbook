@@ -27,8 +27,6 @@ export default async function BillBookDetailViewPage({ params }:{params : { bill
   
   const bills = await getBillsForBillBook(billBookId);
 
-  users.push({name: "You" , id: session.user.userId});
-
   return (
     <div className="min-h-screen bg-background p-8 flex flex-col items-center">
       <div className="w-full max-w-4xl">
@@ -39,10 +37,7 @@ export default async function BillBookDetailViewPage({ params }:{params : { bill
           billbookId={billBookId}
         />
         <UsersAnalyticsComponent
-        users={[...users,{
-          id : session.user.userId,
-          name : "You"
-        }]}
+        users={users}
         billbookId={billBookId}
         />
         <BillTable 

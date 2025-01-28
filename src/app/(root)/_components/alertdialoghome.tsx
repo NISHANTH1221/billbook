@@ -26,11 +26,6 @@ export default function AlertDialogHome() {
     const { toast } = useToast();
     const router = useRouter();
 
-
-    // const handleAddBillBook = () => {
-    //     console.log("button clicked")
-    // }
-
     const handleCreateBillBook = async () => {
         if (newBillBookTitle.trim() === "" && newBillBookDescription.trim() === "") {
             toast({
@@ -51,10 +46,15 @@ export default function AlertDialogHome() {
                     title: "Success",
                     description: "New bill book created successfully. You can now add bills to your book.",
                 });
-                router.push("/billbooks")
+                
             }else{
-                router.push("/");
+                toast({
+                    title: "Error",
+                    description: "Bill book could not be created. Please try again.",
+                    variant: "destructive",
+                });
             }
+            router.push("/billbooks")
         }
     }
     return (

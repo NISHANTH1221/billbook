@@ -61,7 +61,6 @@ export async function createBillUnitsForBill(array : BillUnitArray[]){
                 data: array
             })
         });
-
         return {
             success : true
         }
@@ -167,8 +166,6 @@ export async function getUserWiseStats(billbookId: string) {
                 userHashmap[unit.billbookUserId] += unit.amount;
             });
         }
-
-        console.log(userHashmap);
 
         return {
             success: true,

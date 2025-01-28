@@ -48,70 +48,54 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
     
   
     const handleCreateNewBill = async (values: CreateBillFormValues) => {
-      let total_amount: number = values.amount;
+      const { amount: totalAmount, users, description } = values;
+      const totalUsersAmount = users.reduce((sum, user) => sum + user.amount, 0);
 
-      const users = values.users;
-
-      let total_users_amount: number = 0;
-
-      for(let i=0;i<users.length;i++){
-        total_users_amount += users[i].amount
-      }
-
-
-      if(total_amount != total_users_amount){
+      if (totalAmount !== totalUsersAmount) {
         toast({
-            title  : "Bill is not created",
-            description:"Amount and Total Users amount must be equal",
-            variant :"destructive"
-        })
-      }else{
-        const response = await createNewBill(values.description,total_amount,billbookId);
-
-        if(response.success){
-            if(response.bill){
-                let modified_user_object = users.map((user)=>{
-                    return {
-                      billbookUserId : user.id,
-                      amount: user.amount,
-                      billId: response.bill.billId
-                    }
-                  });
-                const billUnitsResponse = await createBillUnitsForBill(modified_user_object);   
-
-                if(billUnitsResponse){
-                    
-                    toast({
-                        title  : "Bill is created",
-                        description:"Bill is created successfully",
-                    })
-                }
-                else{
-                    const billDeleteResponse = await deleteBill(response.bill.billId);
-                    // should implement it as a transaction bill creation and bill units creation
-                    router.refresh();
-                    toast({
-                        title  : "Bill is not created",
-                        variant: "destructive"
-                    });
-                }
-            }else{
-                toast({
-                    title  : "Bill is not created",
-                    variant: "destructive"
-                });
-            }
-        }else{
-            toast({
-                title  : "Bill is not created",
-                description:"Bill couldnt be created because of internal error",
-                variant :"destructive"
-            });
-        }
+          title: "Bill is not created",
+          description: "Amount and Total Users amount must be equal",
+          variant: "destructive"
+        });
+        return;
       }
-      setIsCreateDialogOpen(false);
-      form.reset();
-    }
+
+      try {
+        const billResponse = await createNewBill(description, totalAmount, billbookId);
+        
+        if (!billResponse.success || !billResponse.bill) {
+          throw new Error("Failed to create bill");
+        }
+
+        const billUnits = users.map((user) => ({
+          billbookUserId: user.id,
+          amount: user.amount,
+          billId: billResponse.bill.billId
+        }));
+
+        const billUnitsResponse = await createBillUnitsForBill(billUnits);
+
+        if (!billUnitsResponse) {
+          await deleteBill(billResponse.bill.billId);
+          throw new Error("Failed to create bill units");
+        }
+
+        toast({
+          title: "Bill is created",
+          description: "Bill is created successfully",
+        });
+        router.refresh();
+      } catch (error) {
+        toast({
+          title: "Bill is not created",
+          description: "Bill couldn't be created because of internal error",
+          variant: "destructive"
+        });
+      } finally {
+        setIsCreateDialogOpen(false);
+        form.reset();
+      }
+    };
   
     return(
         <>
@@ -151,7 +135,7 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
                             <Input 
                                 type="number" 
                                 {...field} 
-                                onChange={e => e.target.value ? field.onChange(parseFloat(e.target.value)) : field.onChange(Number("0")) } 
+                                onChange={e => field.onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))} 
                                 className="h-8" 
                             />
                             </FormControl>
@@ -177,7 +161,7 @@ export default function AlertDialogBillButton({users,billbookId}:{users : User[]
                                         <Input 
                                             type="number" 
                                             {...field} 
-                                            onChange={e => e.target.value ? field.onChange(parseFloat(e.target.value)): field.onChange(parseFloat("0"))} 
+                                            onChange={e => field.onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))} 
                                             className="h-8 w-2/3" 
                                         />
                                         </FormControl>

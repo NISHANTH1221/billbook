@@ -19,11 +19,20 @@ export async function POST(req:NextRequest){
    const body : BillBookCreationBody = await req.json();
 
    try{
-    await prisma.billBook.create({
+     const createdbillbook = await prisma.billBook.create({
         data:{
             title : body.title,
             description : body.description,
             createdby : userId || ""
+        }
+    });
+
+
+    await prisma.billBookUser.create({
+        data: {
+            name: "You",
+            email: session?.user.email || "",
+            billbookId: createdbillbook?.billbookId || ""
         }
     });
 

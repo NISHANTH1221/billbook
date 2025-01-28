@@ -44,7 +44,7 @@ export default function UserAnalyticsComponent({
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await getUserWiseStats(billbookId)
+        const userData = await getUserWiseStats(billbookId);
         if (userData.success) {
           setUserSpendData(userData.data)
         } else {
