@@ -99,95 +99,131 @@ export default function UserAnalyticsComponent({
   }, [chartData])
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Spending Distribution</CardTitle>
-        <CardDescription>User-wise Expenditure</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload
-                  return (
-                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex flex-col">
-                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                            User
-                          </span>
-                          <span className="font-bold">{data.name}</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-[0.70rem] uppercase text-muted-foreground">
-                            Amount
-                          </span>
-                          <span className="font-bold">
-                            ₹{data.amount.toFixed(2)}
-                          </span>
+    <div className="grid grid-cols-1 gap-4">
+      {/* Pie Chart Card */}
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Spending Distribution</CardTitle>
+          <CardDescription>User-wise Expenditure</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[350px]" // Increased height for better visibility
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col">
+                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                              User
+                            </span>
+                            <span className="font-bold">{data.name}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                              Amount
+                            </span>
+                            <span className="font-bold">
+                              ₹{data.amount.toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                }
-                return null
-              }}
-            />
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="name"
-              innerRadius={60}
-              strokeWidth={5}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          ₹{totalSpending.toFixed(0)}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Total Spent
-                        </tspan>
-                      </text>
                     )
                   }
+                  return null
                 }}
               />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          <IndianRupee className="h-4 w-4" />
-          Total Spending: ₹{totalSpending.toFixed(2)}
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing spending distribution across all users
-        </div>
-      </CardFooter>
-    </Card>
+              <Pie
+                data={chartData}
+                dataKey="amount"
+                nameKey="name"
+                innerRadius={60}
+                strokeWidth={5}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            ₹{totalSpending.toFixed(0)}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Total Spent
+                          </tspan>
+                        </text>
+                      )
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            <IndianRupee className="h-4 w-4" />
+            Total Spending: ₹{totalSpending.toFixed(2)}
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Showing spending distribution across all users
+          </div>
+        </CardFooter>
+      </Card>
+
+      {/* Summary Statistics Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Summary Statistics</CardTitle>
+          <CardDescription>Key spending metrics</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {chartData.map((data) => (
+            <div
+              key={data.userId}
+              className="flex flex-col gap-2 p-4 rounded-lg border"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: data.fill }}
+                />
+                <span className="font-medium">{data.name}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <IndianRupee className="h-4 w-4" />
+                <span className="text-xl font-bold">
+                  {data.amount.toFixed(0)}
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {((data.amount / totalSpending) * 100).toFixed(1)}% of total
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   )
 }

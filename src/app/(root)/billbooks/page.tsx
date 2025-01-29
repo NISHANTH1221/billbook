@@ -34,6 +34,7 @@ async function getBillBooks(userId : string){
       billbookId : true,
       title : true,
       lastUpdated : true,
+      description : true
     }
   });
 

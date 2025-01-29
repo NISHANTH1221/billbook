@@ -2,6 +2,7 @@ export interface BillBookPreview {
     billbookId: string,
     title: string,
     lastUpdated : Date,
+    description : string
 }
 
 export interface User {

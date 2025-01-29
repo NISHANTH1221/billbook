@@ -1,40 +1,41 @@
 "use client"
 
-interface BillBookPreview {
-    billbookId: string
-    title: string,
-    lastUpdated : Date
-}
+import { BillBookPreview } from "./models";
+import { Calendar, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
 
-import ClientRenderDateComponent from "@/components/ClientDateComponent"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronRight, Calendar } from 'lucide-react'
-import { useRouter } from "next/navigation"
+export default function BillBookCard({ book }: { book: BillBookPreview }) {
+  const formatDate = (date: string | Date) => {
+    return format(new Date(date), 'MM/dd/yyyy');
+  };
 
+  return (
+    <Link href={`/billbooks/${book.billbookId}`}>
+      <div className="p-6 h-full flex flex-col space-y-4">
+        {/* Card Header */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+            {book.title}
+          </h3>
+          <p className="text-sm text-gray-500 line-clamp-2">
+            {book.description || "No description provided"}
+          </p>
+        </div>
 
-export default function BillBookCard ({book} : {book : BillBookPreview}){
-    const router = useRouter();
-    
-    const handleBillBookClick = (id: string) => {
-        router.push(`/billbooks/${id}`)
-    }
+        {/* Card Stats */}
+        <div className="flex-grow">
+          <div className="flex items-center text-sm text-gray-600">
+            <Calendar className="w-4 h-4 mr-2" />
+            <span>Updated {formatDate(book.lastUpdated)}</span>
+          </div>
+        </div>
 
-    return(
-        <Card 
-            key={book.billbookId} 
-            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 bg-white border-l-4 border-l-primary"
-            onClick={() => handleBillBookClick(book.billbookId)}
-        >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold">{book.title}</CardTitle>
-            <ChevronRight className="h-5 w-5 text-primary" />
-            </CardHeader>
-            <CardContent>
-            <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>Last updated: <ClientRenderDateComponent date={book.lastUpdated}/></span>
-            </div>
-            </CardContent>
-        </Card>
-    )
+        {/* Card Footer */}
+        <div className="flex items-center justify-end pt-4 border-t border-gray-100">
+          <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+        </div>
+      </div>
+    </Link>
+  );
 }
